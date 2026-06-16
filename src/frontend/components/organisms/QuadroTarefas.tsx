@@ -1,10 +1,19 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
 import { Plus } from 'lucide-react';
-import { Tarefa, StatusTarefa } from '@/backend/types/tarefa';
+import Link from 'next/link';
+
 import { buscarTarefasDoUsuario } from '@/backend/services/servicoTarefas';
+import {
+  StatusTarefa,
+  Tarefa,
+} from '@/backend/types/tarefa';
 import { useAutenticacao } from '@/frontend/hooks/useAutenticacao';
+
 import { CardTarefa } from '../molecules/CardTarefa';
 
 export function QuadroTarefas() {
@@ -38,7 +47,7 @@ export function QuadroTarefas() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
         {colunas.map((coluna) => (
-          <div key={coluna.status} className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-4 min-h-[500px]">
+          <div key={coluna.status} className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-4 min-h-125">
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4 px-1 flex justify-between items-center">
               {coluna.titulo}
               <span className="bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-sm py-0.5 px-2.5 rounded-full">

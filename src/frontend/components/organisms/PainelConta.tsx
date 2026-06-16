@@ -136,7 +136,7 @@ export function PainelConta() {
       )}
 
       {modalExcluirAberto && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-900" role="dialog">
             <h2 className="text-lg font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
               <Trash2 className="h-5 w-5" /> Excluir conta?
