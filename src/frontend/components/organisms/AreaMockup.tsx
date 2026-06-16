@@ -1,4 +1,4 @@
-import { Monitor } from "lucide-react";
+import { Monitor } from 'lucide-react';
 
 export function AreaMockup() {
   return (
@@ -16,7 +16,7 @@ export function AreaMockup() {
           </p>
         </div>
 
-        <div className="flex min-h-[320px] items-center justify-center rounded-2xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-12 dark:border-zinc-700 dark:bg-zinc-900/50 sm:min-h-[400px]">
+        <div className="flex min-h-80 items-center justify-center rounded-2xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-12 dark:border-zinc-700 dark:bg-zinc-900/50 sm:min-h-100">
           <div className="text-center">
             <Monitor className="mx-auto mb-4 h-16 w-16 text-zinc-400" />
             <p className="text-lg font-medium text-zinc-500 dark:text-zinc-400">
