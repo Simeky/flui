@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import React, { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
-import { buscarTarefasDoUsuario } from '@/backend/services/servicoTarefas';
+import { CalendarDays, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
+import { buscarTarefasDoUsuario, atualizarTarefa } from '@/backend/services/servicoTarefas';
 import { Tarefa } from '@/backend/types/tarefa';
 import { useAutenticacao } from '@/frontend/hooks/useAutenticacao';
 
@@ -13,6 +13,8 @@ export function CalendarioTarefas() {
   const { usuario } = useAutenticacao();
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [atualizando, setAtualizando] = useState(false);
+  const [draggedTask, setDraggedTask] = useState<Tarefa | null>(null);
   const hoje = new Date();
   const [mesAtual, setMesAtual] = useState(new Date(hoje.getFullYear(), hoje.getMonth(), 1));
   const [dataSelecionada, setDataSelecionada] = useState(new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()));
@@ -28,11 +30,53 @@ export function CalendarioTarefas() {
 
   const tarefasPorData = useMemo(() => {
     return tarefas.reduce<Record<string, Tarefa[]>>((acumulador, tarefa) => {
-      const key = tarefa.criadoEm.toISOString().slice(0, 10);
+      // Agrupar por data de vencimento se existir, senão por data de criação
+      const data = tarefa.dataVencimento || tarefa.criadoEm;
+      const key = data.toISOString().slice(0, 10);
       acumulador[key] = acumulador[key] ? [...acumulador[key], tarefa] : [tarefa];
       return acumulador;
     }, {});
   }, [tarefas]);
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, tarefa: Tarefa) => {
+    setDraggedTask(tarefa);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDropOnDay = async (e: React.DragEvent<HTMLDivElement>, dia: number) => {
+    e.preventDefault();
+    if (!draggedTask) return;
+
+    const novaData = new Date(ano, mes, dia);
+    novaData.setHours(12, 0, 0, 0);
+
+    try {
+      setAtualizando(true);
+      await atualizarTarefa(draggedTask.id, { dataVencimento: novaData });
+      
+      // Atualizar estado local
+      setTarefas(tarefas.map(t => 
+        t.id === draggedTask.id ? { ...t, dataVencimento: novaData } : t
+      ));
+      
+      // Se a tarefa foi movida para o dia selecionado, atualizar seleção
+      const chaveNovoDia = novaData.toISOString().slice(0, 10);
+      const chaveDiaSelecionado = dataSelecionada.toISOString().slice(0, 10);
+      if (chaveNovoDia === chaveDiaSelecionado) {
+        setDataSelecionada(novaData);
+      }
+    } catch (erro) {
+      console.error('Erro ao atualizar data de vencimento:', erro);
+    } finally {
+      setAtualizando(false);
+      setDraggedTask(null);
+    }
+  };
 
   const ano = mesAtual.getFullYear();
   const mes = mesAtual.getMonth();
@@ -58,7 +102,7 @@ export function CalendarioTarefas() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Calendário de Tarefas</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Veja as tarefas criadas por dia e clique para abrir o detalhe.</p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Visualize as datas de vencimento e arraste as tarefas para alterar suas datas.</p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-3 py-2">
           <button
@@ -103,14 +147,15 @@ export function CalendarioTarefas() {
                 const estaSelecionado = dataSelecionada.toISOString().slice(0, 10) === dataKey;
 
                 return (
-                  <button
+                  <div
                     key={dataKey}
-                    type="button"
                     onClick={() => setDataSelecionada(dataAtualDia)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDropOnDay(e, dia)}
                     className={
-                      `group flex h-20 flex-col justify-between rounded-3xl border p-3 text-left transition ${
+                      `group flex h-20 flex-col justify-between rounded-3xl border p-3 text-left transition cursor-pointer ${
                         estaSelecionado ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm dark:bg-indigo-950/60 dark:text-white' : 'border-zinc-200 bg-zinc-50 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700'
-                      }`
+                      } ${draggedTask ? 'hover:ring-2 hover:ring-indigo-400 hover:ring-offset-2' : ''}`
                     }
                   >
                     <span className="text-sm font-semibold">{dia}</span>
@@ -121,35 +166,53 @@ export function CalendarioTarefas() {
                     ) : (
                       <span className="text-xs text-zinc-400 dark:text-zinc-500">Sem tarefa</span>
                     )}
-                  </button>
+                  </div>
                 );
               })}
             </div>
           </div>
 
           <div className="space-y-4 rounded-3xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-white">
-              <CalendarDays className="w-4 h-4" />
-              <span>{dataSelecionada.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-white">
+                <CalendarDays className="w-4 h-4" />
+                <span>{dataSelecionada.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">💡 Arraste as tarefas para outro dia para alterar a data de vencimento</p>
             </div>
             <div className="space-y-3">
               {tarefasDoDia.length === 0 ? (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">Nenhuma tarefa foi criada neste dia.</p>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">Nenhuma tarefa com vencimento neste dia.</p>
               ) : (
                 tarefasDoDia.map((tarefa) => (
-                  <Link
+                  <div
                     key={tarefa.id}
-                    href={`/tarefas/${tarefa.id}`}
-                    className="block rounded-3xl border border-zinc-200 bg-white px-4 py-4 text-sm text-zinc-900 transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white dark:hover:border-indigo-500"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, tarefa)}
+                    className={`rounded-3xl border border-zinc-200 bg-white px-4 py-4 text-sm text-zinc-900 transition cursor-move hover:border-indigo-300 hover:bg-indigo-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white dark:hover:border-indigo-500 ${
+                      draggedTask?.id === tarefa.id ? 'opacity-50 ring-2 ring-indigo-500' : ''
+                    } ${atualizando ? 'pointer-events-none opacity-60' : ''}`}
                   >
-                    <div className="font-semibold">{tarefa.titulo}</div>
-                    <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{tarefa.descricao || 'Sem descrição'}</p>
+                    <Link
+                      href={`/tarefas/${tarefa.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="block"
+                    >
+                      <div className="font-semibold">{tarefa.titulo}</div>
+                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{tarefa.descricao || 'Sem descrição'}</p>
+                    </Link>
                     <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
                       <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-800">{tarefa.status.replace('_', ' ')}</span>
                       <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-800">Prioridade: {tarefa.prioridade}</span>
-                      <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-800">Criada em {tarefa.criadoEm.toLocaleDateString('pt-BR')}</span>
+                      {tarefa.dataVencimento ? (
+                        <span className="rounded-full bg-amber-100 px-2 py-1 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200">
+                          Vence em {tarefa.dataVencimento.toLocaleDateString('pt-BR')}
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-800 italic">Sem data de vencimento</span>
+                      )}
                     </div>
-                  </Link>
+                  </div>
                 ))
               )}
             </div>

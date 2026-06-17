@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ProvedorAutenticacao } from "@/frontend/contexts/ContextoAutenticacao";
+import { PainelAcessibilidade } from "@/frontend/components/organisms/PainelAcessibilidade";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,6 +33,8 @@ export default function LayoutRaiz({
     >
       <body className="flex min-h-full flex-col">
         <ProvedorAutenticacao>{children}</ProvedorAutenticacao>
+
+        <PainelAcessibilidade />
 
         <div {...{ vw: '' }} className="enabled fixed bottom-4 right-4 z-50" aria-hidden="true">
           <div {...{ 'vw-access-button': '' }} className="active" />
