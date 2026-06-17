@@ -1,7 +1,6 @@
 'use client';
 import { Cabecalho } from '@/frontend/components/organisms/Cabecalho';
 import { ResumoTarefas } from '@/frontend/components/organisms/ResumoTarefas';
-import { CalendarioTarefas } from '@/frontend/components/organisms/CalendarioTarefas';
 import { QuadroTarefas } from '@/frontend/components/organisms/QuadroTarefas';
 
 export function ConteudoDashboard() {
@@ -13,11 +12,6 @@ export function ConteudoDashboard() {
         <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-8">Visão Geral</h1>
         <div className="grid gap-6">
           <ResumoTarefas />
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[1.3fr_0.9fr]">
-          <ResumoTarefas />
-          <CalendarioTarefas />
         </div>
 
         <section className="mt-10">
