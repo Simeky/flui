@@ -147,6 +147,7 @@ export function CalendarioTarefas() {
                     <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
                       <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-800">{tarefa.status.replace('_', ' ')}</span>
                       <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-800">Prioridade: {tarefa.prioridade}</span>
+                      <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-800">Criada em {tarefa.criadoEm.toLocaleDateString('pt-BR')}</span>
                     </div>
                   </Link>
                 ))
