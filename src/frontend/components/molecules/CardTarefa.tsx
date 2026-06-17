@@ -30,15 +30,21 @@ export function CardTarefa({ tarefa }: { tarefa: Tarefa }) {
       </div>
       
       <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-        <div className="flex items-center gap-1">
-          <StatusTarefaBadge status={tarefa.status} />
+        <div className="space-y-1">
+          <div className="flex items-center gap-1">
+            <StatusTarefaBadge status={tarefa.status} />
+          </div>
+          <div className="flex items-center gap-1">
+            <CalendarDays className="w-3.5 h-3.5" />
+            <span>Criada em {tarefa.criadoEm.toLocaleDateString('pt-BR')}</span>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           {totalSubtarefas > 0 && (
             <div className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> {subtarefasConcluidas}/{totalSubtarefas}</div>
           )}
           {tarefa.dataVencimento && (
-            <div className="flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> {new Date(tarefa.dataVencimento).toLocaleDateString()}</div>
+            <div className="flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> {new Date(tarefa.dataVencimento).toLocaleDateString('pt-BR')}</div>
           )}
         </div>
       </div>

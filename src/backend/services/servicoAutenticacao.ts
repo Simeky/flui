@@ -15,12 +15,16 @@ import {
   type User,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { auth } from "@/backend/lib/firebase";
+import { getFirebaseAuth } from "@/backend/lib/firebase";
 import type { Usuario } from "@/backend/types/usuario";
 import {
   NOME_COOKIE_SESSAO,
   DURACAO_COOKIE_SEGUNDOS,
 } from "@/backend/constants/autenticacao";
+
+function obterAuth() {
+  return getFirebaseAuth();
+}
 
 function usaProvedorEmail(usuario: User): boolean {
   return usuario.providerData.some(
@@ -60,7 +64,7 @@ export function limparCookieSessao(): void {
 async function bloquearSeEmailNaoVerificado(usuario: User): Promise<void> {
   if (!usaProvedorEmail(usuario) || usuario.emailVerified) return;
 
-  await signOut(auth);
+  await signOut(obterAuth());
   limparCookieSessao();
 
   throw new FirebaseError(
@@ -73,7 +77,7 @@ export async function entrarComEmail(
   email: string,
   senha: string,
 ): Promise<Usuario> {
-  const credencial = await signInWithEmailAndPassword(auth, email, senha);
+  const credencial = await signInWithEmailAndPassword(obterAuth(), email, senha);
   await bloquearSeEmailNaoVerificado(credencial.user);
   await definirCookieSessao(credencial.user);
   return mapearUsuarioFirebase(credencial.user);
@@ -84,36 +88,36 @@ export async function cadastrarComEmail(
   email: string,
   senha: string,
 ): Promise<void> {
-  const credencial = await createUserWithEmailAndPassword(auth, email, senha);
+  const credencial = await createUserWithEmailAndPassword(obterAuth(), email, senha);
   await updateProfile(credencial.user, { displayName: nome });
   await sendEmailVerification(credencial.user);
-  await signOut(auth);
+  await signOut(obterAuth());
   limparCookieSessao();
 }
 
 export async function entrarComGoogle(): Promise<Usuario> {
   const provedor = new GoogleAuthProvider();
-  const credencial = await signInWithPopup(auth, provedor);
+  const credencial = await signInWithPopup(obterAuth(), provedor);
   await definirCookieSessao(credencial.user);
   return mapearUsuarioFirebase(credencial.user);
 }
 
 export async function entrarComGithub(): Promise<Usuario> {
   const provedor = new GithubAuthProvider();
-  const credencial = await signInWithPopup(auth, provedor);
+  const credencial = await signInWithPopup(obterAuth(), provedor);
   await definirCookieSessao(credencial.user);
   return mapearUsuarioFirebase(credencial.user);
 }
 
 export async function sair(): Promise<void> {
-  await signOut(auth);
+  await signOut(obterAuth());
   limparCookieSessao();
 }
 
 export type ProvedorReautenticacao = "email" | "google" | "github";
 
 export function obterProvedorPrincipal(): ProvedorReautenticacao {
-  const usuario = auth.currentUser;
+  const usuario = obterAuth().currentUser;
   if (!usuario) return "email";
 
   const provedores = usuario.providerData.map((p) => p.providerId);
@@ -127,6 +131,7 @@ async function reautenticarUsuario(
   senha?: string,
   provedor?: ProvedorReautenticacao,
 ): Promise<void> {
+  const auth = obterAuth();
   const usuario = auth.currentUser;
   if (!usuario) {
     throw new Error("Nenhum usuário autenticado.");
@@ -153,6 +158,7 @@ async function reautenticarUsuario(
 }
 
 export async function excluirConta(senha?: string): Promise<void> {
+  const auth = obterAuth();
   const usuario = auth.currentUser;
   if (!usuario) {
     throw new Error("Nenhum usuário autenticado.");
@@ -183,10 +189,10 @@ export async function excluirConta(senha?: string): Promise<void> {
 export function observarAutenticacao(
   callback: (usuario: Usuario | null) => void,
 ): () => void {
-  return onAuthStateChanged(auth, async (usuarioFirebase) => {
+  return onAuthStateChanged(obterAuth(), async (usuarioFirebase) => {
     if (usuarioFirebase) {
       if (usaProvedorEmail(usuarioFirebase) && !usuarioFirebase.emailVerified) {
-        await signOut(auth);
+        await signOut(obterAuth());
         limparCookieSessao();
         callback(null);
         return;
