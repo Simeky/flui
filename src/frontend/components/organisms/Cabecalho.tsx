@@ -2,6 +2,7 @@
 import {
   CheckSquare,
   LayoutDashboard,
+  Calendar,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -27,6 +28,9 @@ export function Cabecalho() {
         <nav className="flex items-center gap-6">
           <Link href="/dashboard" className={navLinkClass('/dashboard')}>
             <LayoutDashboard className="w-4 h-4"/> Dashboard
+          </Link>
+          <Link href="/calendario" className={navLinkClass('/calendario')}>
+            <Calendar className="w-4 h-4"/> Calendário
           </Link>
           <Link href="/tarefas" className={navLinkClass('/tarefas')}>
             <CheckSquare className="w-4 h-4"/> Tarefas
