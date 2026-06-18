@@ -13,6 +13,7 @@ export function PainelAcessibilidade() {
   const [posicao, setPosicao] = useState({ x: 16, y: 80 });
   const [arrastando, setArrastando] = useState(false);
   const [offsetArrasto, setOffsetArrasto] = useState({ x: 0, y: 0 });
+  const [movedDuringDrag, setMovedDuringDrag] = useState(false);
 
   useEffect(() => {
     // Recuperar preferências salvas
@@ -85,16 +86,23 @@ export function PainelAcessibilidade() {
       x: e.clientX - posicao.x,
       y: e.clientY - posicao.y,
     });
+    setMovedDuringDrag(false);
   };
 
   useEffect(() => {
     if (!arrastando) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      setPosicao({
-        x: e.clientX - offsetArrasto.x,
-        y: e.clientY - offsetArrasto.y,
-      });
+      const newX = e.clientX - offsetArrasto.x;
+      const newY = e.clientY - offsetArrasto.y;
+      // marcar como movimento se houver deslocamento perceptível
+      if (!movedDuringDrag) {
+        const dx = Math.abs(newX - posicao.x);
+        const dy = Math.abs(newY - posicao.y);
+        if (dx > 3 || dy > 3) setMovedDuringDrag(true);
+      }
+
+      setPosicao({ x: newX, y: newY });
     };
 
     const handleMouseUp = () => {
@@ -108,7 +116,7 @@ export function PainelAcessibilidade() {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [arrastando, offsetArrasto]);
+  }, [arrastando, offsetArrasto, movedDuringDrag, posicao]);
 
   const resetarPreferencias = () => {
     setTamanhoFonte(100);
@@ -303,7 +311,15 @@ export function PainelAcessibilidade() {
         )}
 
         <button
-          onClick={() => setAberto(!aberto)}
+          onMouseDown={handleMouseDown}
+          onClick={() => {
+            if (movedDuringDrag) {
+              // se houve arraste, não alternar o painel
+              setMovedDuringDrag(false);
+              return;
+            }
+            setAberto(!aberto);
+          }}
           className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg transition-all"
           aria-label={aberto ? 'Fechar painel de acessibilidade' : 'Abrir painel de acessibilidade'}
           aria-expanded={aberto}
