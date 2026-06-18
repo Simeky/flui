@@ -30,12 +30,18 @@ export function CalendarioTarefas() {
 
   const tarefasPorData = useMemo(() => {
     return tarefas.reduce<Record<string, Tarefa[]>>((acumulador, tarefa) => {
-      // Agrupar por data de vencimento se existir, senão por data de criação
-      const data = tarefa.dataVencimento || tarefa.criadoEm;
-      const key = data.toISOString().slice(0, 10);
-      acumulador[key] = acumulador[key] ? [...acumulador[key], tarefa] : [tarefa];
+      // Agrupar SEMPRE por data de vencimento se existir
+      if (tarefa.dataVencimento) {
+        const key = tarefa.dataVencimento.toISOString().slice(0, 10);
+        acumulador[key] = acumulador[key] ? [...acumulador[key], tarefa] : [tarefa];
+      }
       return acumulador;
     }, {});
+  }, [tarefas]);
+
+  // Tarefas sem data de vencimento
+  const tarefasSemData = useMemo(() => {
+    return tarefas.filter(t => !t.dataVencimento);
   }, [tarefas]);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, tarefa: Tarefa) => {
@@ -170,6 +176,38 @@ export function CalendarioTarefas() {
                 );
               })}
             </div>
+
+            {/* Seção de tarefas sem data de vencimento */}
+            {tarefasSemData.length > 0 && (
+              <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-amber-950/20">
+                <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-200 mb-3">
+                  📌 Tarefas sem data de vencimento ({tarefasSemData.length})
+                </h3>
+                <p className="text-xs text-amber-700 dark:text-amber-300 mb-3">
+                  Arraste estas tarefas para um dia no calendário para definir a data de vencimento
+                </p>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {tarefasSemData.map((tarefa) => (
+                    <div
+                      key={tarefa.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, tarefa)}
+                      className={`rounded-2xl border border-amber-300 bg-white px-3 py-2 text-xs text-zinc-900 transition cursor-move hover:border-amber-400 hover:bg-amber-100 dark:border-amber-700 dark:bg-zinc-900 dark:text-white dark:hover:border-amber-600 dark:hover:bg-zinc-800 ${
+                        draggedTask?.id === tarefa.id ? 'opacity-50 ring-2 ring-amber-500' : ''
+                      } ${atualizando ? 'pointer-events-none opacity-60' : ''}`}
+                    >
+                      <Link
+                        href={`/tarefas/${tarefa.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="block font-medium line-clamp-1"
+                      >
+                        {tarefa.titulo}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4 rounded-3xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-950">
