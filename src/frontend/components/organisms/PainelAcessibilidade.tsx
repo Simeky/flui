@@ -1,14 +1,18 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Plus, Minus, Contrast, Zap, Type } from 'lucide-react';
+import { Plus, Minus, Contrast, Zap, Type, Sun, Moon } from 'lucide-react';
 
 export function PainelAcessibilidade() {
   const [tamanhoFonte, setTamanhoFonte] = useState(100);
   const [altoContraste, setAltoContraste] = useState(false);
   const [reduzirAnimacoes, setReduzirAnimacoes] = useState(false);
   const [modoDislexia, setModoDislexia] = useState(false);
+  const [modoEscuro, setModoEscuro] = useState(false);
   const [aberto, setAberto] = useState(false);
+  const [posicao, setPosicao] = useState({ x: 16, y: 80 });
+  const [arrastando, setArrastando] = useState(false);
+  const [offsetArrasto, setOffsetArrasto] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     // Recuperar preferências salvas
@@ -19,6 +23,8 @@ export function PainelAcessibilidade() {
       setAltoContraste(prefs.altoContraste || false);
       setReduzirAnimacoes(prefs.reduzirAnimacoes || false);
       setModoDislexia(prefs.modoDislexia || false);
+      setModoEscuro(prefs.modoEscuro || false);
+      setPosicao(prefs.posicao || { x: 16, y: 80 });
     }
   }, []);
 
@@ -47,14 +53,23 @@ export function PainelAcessibilidade() {
       document.documentElement.classList.remove('modo-dislexia');
     }
 
+    // Aplicar modo escuro
+    if (modoEscuro) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
     // Salvar preferências
     localStorage.setItem('acessibilidade', JSON.stringify({
       tamanhoFonte,
       altoContraste,
       reduzirAnimacoes,
       modoDislexia,
+      modoEscuro,
+      posicao,
     }));
-  }, [tamanhoFonte, altoContraste, reduzirAnimacoes, modoDislexia]);
+  }, [tamanhoFonte, altoContraste, reduzirAnimacoes, modoDislexia, modoEscuro, posicao]);
 
   const aumentarFonte = () => {
     setTamanhoFonte((prev) => Math.min(prev + 10, 150));
@@ -64,11 +79,44 @@ export function PainelAcessibilidade() {
     setTamanhoFonte((prev) => Math.max(prev - 10, 80));
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setArrastando(true);
+    setOffsetArrasto({
+      x: e.clientX - posicao.x,
+      y: e.clientY - posicao.y,
+    });
+  };
+
+  useEffect(() => {
+    if (!arrastando) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setPosicao({
+        x: e.clientX - offsetArrasto.x,
+        y: e.clientY - offsetArrasto.y,
+      });
+    };
+
+    const handleMouseUp = () => {
+      setArrastando(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [arrastando, offsetArrasto]);
+
   const resetarPreferencias = () => {
     setTamanhoFonte(100);
     setAltoContraste(false);
     setReduzirAnimacoes(false);
     setModoDislexia(false);
+    setModoEscuro(false);
+    setPosicao({ x: 16, y: 80 });
     localStorage.removeItem('acessibilidade');
   };
 
@@ -106,10 +154,13 @@ export function PainelAcessibilidade() {
         }
       `}</style>
 
-      <div className="fixed bottom-20 right-4 z-40">
+      <div style={{ left: `${posicao.x}px`, top: `${posicao.y}px` }} className="fixed z-40">
         {aberto && (
-          <div className="mb-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 shadow-lg space-y-3 w-72">
-            <h3 className="font-semibold text-sm text-zinc-900 dark:text-white">Acessibilidade</h3>
+          <div
+            className="mb-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 shadow-lg space-y-3 w-72 cursor-move"
+            onMouseDown={handleMouseDown}
+          >
+            <h3 className="font-semibold text-sm text-zinc-900 dark:text-white select-none">Acessibilidade</h3>
 
             {/* Tamanho de Fonte */}
             <div className="space-y-2">
@@ -206,6 +257,35 @@ export function PainelAcessibilidade() {
                 <span
                   className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
                     modoDislexia ? 'translate-x-6' : 'translate-x-0.5'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Modo Claro/Escuro */}
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
+                {modoEscuro ? (
+                  <Moon className="w-3.5 h-3.5" />
+                ) : (
+                  <Sun className="w-3.5 h-3.5" />
+                )}
+                Modo Escuro
+              </label>
+              <button
+                onClick={() => setModoEscuro(!modoEscuro)}
+                className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
+                  modoEscuro
+                    ? 'bg-indigo-600'
+                    : 'bg-zinc-200 dark:bg-zinc-700'
+                }`}
+                role="switch"
+                aria-checked={modoEscuro}
+                aria-label="Alternar modo claro/escuro"
+              >
+                <span
+                  className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
+                    modoEscuro ? 'translate-x-6' : 'translate-x-0.5'
                   }`}
                 />
               </button>
