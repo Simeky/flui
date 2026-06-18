@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Plus, Minus, Contrast2, Zap, Type } from 'lucide-react';
+import { Plus, Minus, Contrast, Zap, Type } from 'lucide-react';
 
 export function PainelAcessibilidade() {
   const [tamanhoFonte, setTamanhoFonte] = useState(100);
@@ -142,7 +142,7 @@ export function PainelAcessibilidade() {
             {/* Alto Contraste */}
             <div className="flex items-center justify-between">
               <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
-                <Contrast2 className="w-3.5 h-3.5" /> Alto Contraste
+                <Contrast className="w-3.5 h-3.5" /> Alto Contraste
               </label>
               <button
                 onClick={() => setAltoContraste(!altoContraste)}
