@@ -57,7 +57,11 @@ export function CardTarefa({ tarefa, draggable, onDragStart, onDragEnd }: CardTa
             <div className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> {subtarefasConcluidas}/{totalSubtarefas}</div>
           )}
           {tarefa.dataVencimento && (
-            <div className="flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> {new Date(tarefa.dataVencimento).toLocaleDateString('pt-BR')}</div>
+            <div className="flex items-center gap-1">
+              <CalendarDays className="w-3.5 h-3.5" />
+              <span>Vencimento:</span>
+              <span>{new Date(tarefa.dataVencimento).toLocaleDateString('pt-BR')}</span>
+            </div>
           )}
         </div>
       </div>
