@@ -5,13 +5,26 @@ import { PrioridadeTarefaBadge } from '../atoms/PrioridadeTarefaBadge';
 import { BarraProgresso } from '../atoms/BarraProgresso';
 import { CalendarDays, CheckCircle2 } from 'lucide-react';
 
-export function CardTarefa({ tarefa }: { tarefa: Tarefa }) {
+interface CardTarefaProps {
+  tarefa: Tarefa;
+  draggable?: boolean;
+  onDragStart?: React.DragEventHandler<HTMLAnchorElement>;
+  onDragEnd?: React.DragEventHandler<HTMLAnchorElement>;
+}
+
+export function CardTarefa({ tarefa, draggable, onDragStart, onDragEnd }: CardTarefaProps) {
   const totalSubtarefas = tarefa.subtarefas?.length || 0;
   const subtarefasConcluidas = tarefa.subtarefas?.filter(s => s.concluida).length || 0;
   const progresso = totalSubtarefas > 0 ? (subtarefasConcluidas / totalSubtarefas) * 100 : (tarefa.status === 'concluida' ? 100 : 0);
 
   return (
-    <Link href={'/tarefas/' + tarefa.id} className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:shadow-md transition-shadow">
+    <Link
+      href={'/tarefas/' + tarefa.id}
+      draggable={draggable}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:shadow-md transition-shadow"
+    >
       <div className="flex justify-between items-start mb-3">
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-white line-clamp-1">{tarefa.titulo}</h3>
         <div className="flex gap-2 shrink-0 ml-2">
