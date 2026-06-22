@@ -1,12 +1,30 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  Plus,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useAutenticacao } from '@/frontend/hooks/useAutenticacao';
-import { Tarefa, StatusTarefa, PrioridadeTarefa, Subtarefa, Comentario } from '@/backend/types/tarefa';
-import { buscarTarefaPorId, criarTarefa, atualizarTarefa, excluirTarefa } from '@/backend/services/servicoTarefas';
-import { ArrowLeft, Plus, Trash2, Check, X } from 'lucide-react';
 import Swal from 'sweetalert2';
-import Link from 'next/link';
+
+import {
+  atualizarTarefa,
+  buscarTarefaPorId,
+  criarTarefa,
+  excluirTarefa,
+} from '@/backend/services/servicoTarefas';
+import {
+  Comentario,
+  PrioridadeTarefa,
+  StatusTarefa,
+  Subtarefa,
+} from '@/backend/types/tarefa';
+import { useAutenticacao } from '@/frontend/hooks/useAutenticacao';
 
 export function FormularioTarefa({ id }: { id: string }) {
   const { usuario } = useAutenticacao();
@@ -65,7 +83,7 @@ export function FormularioTarefa({ id }: { id: string }) {
     
     setSalvando(true);
     try {
-      const dados = {
+      const dadosBase = {
         usuarioId: usuario.uid,
         titulo,
         descricao,
@@ -77,11 +95,14 @@ export function FormularioTarefa({ id }: { id: string }) {
       };
 
       if (isNova) {
-        await criarTarefa(dados);
+        await criarTarefa({
+          ...dadosBase,
+          ocultoNoKanban: true,
+        });
         mostrarToast('Tarefa criada com sucesso!', 'success');
         router.push('/tarefas');
       } else {
-        await atualizarTarefa(id, dados);
+        await atualizarTarefa(id, dadosBase);
         mostrarToast('Tarefa atualizada com sucesso!', 'success');
         router.push('/tarefas');
       }
@@ -116,6 +137,7 @@ export function FormularioTarefa({ id }: { id: string }) {
       }
     }
   };
+
   const adicionarSubtarefa = () => {
     if (!novaSubtarefa.trim()) return;
     setSubtarefas([...subtarefas, { id: Date.now().toString(), titulo: novaSubtarefa, concluida: false }]);
@@ -141,9 +163,6 @@ export function FormularioTarefa({ id }: { id: string }) {
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 md:p-8">
       <div className="flex items-center justify-between mb-8">
-        <Link href="/tarefas" className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
-          <ArrowLeft className="w-5 h-5" /> Voltar
-        </Link>
         {!isNova && (
           <button type="button" onClick={deletar} className="text-red-500 hover:text-red-600 flex items-center gap-2">
             <Trash2 className="w-5 h-5" /> Excluir
