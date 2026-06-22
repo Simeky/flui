@@ -7,6 +7,7 @@ import React, {
 
 import {
   Contrast,
+  Hand,
   Minus,
   Moon,
   Plus,
@@ -15,12 +16,23 @@ import {
   Zap,
 } from 'lucide-react';
 
+declare module 'react' {
+  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+    vw?: string;
+    'vw-access-button'?: string;
+    'vw-plugin-wrapper'?: string;
+  }
+}
+
 export function PainelAcessibilidade() {
   const [tamanhoFonte, setTamanhoFonte] = useState(100);
   const [altoContraste, setAltoContraste] = useState(false);
   const [reduzirAnimacoes, setReduzirAnimacoes] = useState(false);
   const [modoDislexia, setModoDislexia] = useState(false);
   const [modoEscuro, setModoEscuro] = useState(false);
+  const [vlibrasAtivo, setVlibrasAtivo] = useState(false);
+  const [vlibrasRenderizado, setVlibrasRenderizado] = useState(false);
+
   const [aberto, setAberto] = useState(false);
   const [posicao, setPosicao] = useState({ x: 16, y: 80 });
   const [arrastando, setArrastando] = useState(false);
@@ -37,34 +49,53 @@ export function PainelAcessibilidade() {
       setModoDislexia(prefs.modoDislexia || false);
       setModoEscuro(prefs.modoEscuro || false);
       setPosicao(prefs.posicao || { x: 16, y: 80 });
+      
+      if (prefs.vlibrasAtivo) {
+        setVlibrasAtivo(true);
+        setVlibrasRenderizado(true);
+      }
     }
   }, []);
 
   useEffect(() => {
+    if (vlibrasRenderizado && !document.getElementById('vlibras-script')) {
+      const script = document.createElement('script');
+      script.id = 'vlibras-script';
+      script.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+      script.async = true;
+      script.onload = () => {
+        // @ts-ignore
+        if (window.VLibras && !window.vlibrasInit) {
+          // @ts-ignore
+          window.vlibrasInit = true; 
+          // @ts-ignore
+          new window.VLibras.Widget('https://vlibras.gov.br/app');
+        }
+      };
+      document.body.appendChild(script);
+    }
+  }, [vlibrasRenderizado]);
+
+  useEffect(() => {
     document.documentElement.style.fontSize = `${tamanhoFonte}%`;
 
-    if (altoContraste) {
-      document.documentElement.classList.add('alto-contraste');
-    } else {
-      document.documentElement.classList.remove('alto-contraste');
-    }
+    if (altoContraste) document.documentElement.classList.add('alto-contraste');
+    else document.documentElement.classList.remove('alto-contraste');
 
-    if (reduzirAnimacoes) {
-      document.documentElement.classList.add('reduzir-animacoes');
-    } else {
-      document.documentElement.classList.remove('reduzir-animacoes');
-    }
+    if (reduzirAnimacoes) document.documentElement.classList.add('reduzir-animacoes');
+    else document.documentElement.classList.remove('reduzir-animacoes');
 
-    if (modoDislexia) {
-      document.documentElement.classList.add('modo-dislexia');
-    } else {
-      document.documentElement.classList.remove('modo-dislexia');
-    }
+    if (modoDislexia) document.documentElement.classList.add('modo-dislexia');
+    else document.documentElement.classList.remove('modo-dislexia');
 
-    if (modoEscuro) {
-      document.documentElement.classList.add('dark');
+    if (modoEscuro) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+
+    if (vlibrasAtivo) {
+      setVlibrasRenderizado(true); 
+      document.documentElement.classList.add('vlibras-ativo');
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove('vlibras-ativo');
     }
 
     const salvo = localStorage.getItem('acessibilidade');
@@ -76,8 +107,9 @@ export function PainelAcessibilidade() {
       reduzirAnimacoes,
       modoDislexia,
       modoEscuro,
+      vlibrasAtivo,
     }));
-  }, [tamanhoFonte, altoContraste, reduzirAnimacoes, modoDislexia, modoEscuro]);
+  }, [tamanhoFonte, altoContraste, reduzirAnimacoes, modoDislexia, modoEscuro, vlibrasAtivo]);
 
   const aumentarFonte = () => setTamanhoFonte((prev) => Math.min(prev + 10, 150));
   const diminuirFonte = () => setTamanhoFonte((prev) => Math.max(prev - 10, 80));
@@ -132,12 +164,22 @@ export function PainelAcessibilidade() {
     setReduzirAnimacoes(false);
     setModoDislexia(false);
     setModoEscuro(false);
+    setVlibrasAtivo(false);
     setPosicao({ x: 16, y: 80 });
     localStorage.removeItem('acessibilidade');
   };
 
   return (
     <>
+      {vlibrasRenderizado && (
+        <div vw="true" className="enabled">
+          <div vw-access-button="true" className="active"></div>
+          <div vw-plugin-wrapper="true">
+            <div className="vw-plugin-top-wrapper"></div>
+          </div>
+        </div>
+      )}
+
       <style jsx global>{`
         :root.alto-contraste {
           --color-bg: #000;
@@ -158,6 +200,11 @@ export function PainelAcessibilidade() {
         :root.modo-dislexia, :root.modo-dislexia * {
           font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif !important;
           letter-spacing: 0.12em !important;
+        }
+        
+        /* Oculta o widget do VLibras graciosamente caso a chave seja desligada */
+        :root:not(.vlibras-ativo) [vw] {
+          display: none !important;
         }
       `}</style>
 
@@ -266,10 +313,27 @@ export function PainelAcessibilidade() {
               </button>
             </div>
 
+            {/* VLibras */}
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
+                <Hand className="w-3.5 h-3.5" /> VLibras
+              </label>
+              <button
+                onClick={() => setVlibrasAtivo(!vlibrasAtivo)}
+                className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
+                  vlibrasAtivo ? 'bg-indigo-600' : 'bg-zinc-200 dark:bg-zinc-700'
+                }`}
+                role="switch"
+                aria-checked={vlibrasAtivo}
+              >
+                <span className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${vlibrasAtivo ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+
             {/* Resetar */}
             <button
               onClick={resetarPreferencias}
-              className="w-full px-3 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full transition-colors"
+              className="w-full px-3 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full transition-colors mt-2"
             >
               Resetar Preferências
             </button>
