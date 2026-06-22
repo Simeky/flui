@@ -1,7 +1,19 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Plus, Minus, Contrast, Zap, Type, Sun, Moon } from 'lucide-react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  Contrast,
+  Minus,
+  Moon,
+  Plus,
+  Sun,
+  Type,
+  Zap,
+} from 'lucide-react';
 
 export function PainelAcessibilidade() {
   const [tamanhoFonte, setTamanhoFonte] = useState(100);
@@ -16,7 +28,6 @@ export function PainelAcessibilidade() {
   const [movedDuringDrag, setMovedDuringDrag] = useState(false);
 
   useEffect(() => {
-    // Recuperar preferências salvas
     const salvo = localStorage.getItem('acessibilidade');
     if (salvo) {
       const prefs = JSON.parse(salvo);
@@ -30,55 +41,46 @@ export function PainelAcessibilidade() {
   }, []);
 
   useEffect(() => {
-    // Aplicar tamanho de fonte
     document.documentElement.style.fontSize = `${tamanhoFonte}%`;
 
-    // Aplicar alto contraste
     if (altoContraste) {
       document.documentElement.classList.add('alto-contraste');
     } else {
       document.documentElement.classList.remove('alto-contraste');
     }
 
-    // Aplicar reduzir animações
     if (reduzirAnimacoes) {
       document.documentElement.classList.add('reduzir-animacoes');
     } else {
       document.documentElement.classList.remove('reduzir-animacoes');
     }
 
-    // Aplicar modo dislexia
     if (modoDislexia) {
       document.documentElement.classList.add('modo-dislexia');
     } else {
       document.documentElement.classList.remove('modo-dislexia');
     }
 
-    // Aplicar modo escuro
     if (modoEscuro) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
 
-    // Salvar preferências
+    const salvo = localStorage.getItem('acessibilidade');
+    const prefsAtuais = salvo ? JSON.parse(salvo) : {};
     localStorage.setItem('acessibilidade', JSON.stringify({
+      ...prefsAtuais,
       tamanhoFonte,
       altoContraste,
       reduzirAnimacoes,
       modoDislexia,
       modoEscuro,
-      posicao,
     }));
-  }, [tamanhoFonte, altoContraste, reduzirAnimacoes, modoDislexia, modoEscuro, posicao]);
+  }, [tamanhoFonte, altoContraste, reduzirAnimacoes, modoDislexia, modoEscuro]);
 
-  const aumentarFonte = () => {
-    setTamanhoFonte((prev) => Math.min(prev + 10, 150));
-  };
-
-  const diminuirFonte = () => {
-    setTamanhoFonte((prev) => Math.max(prev - 10, 80));
-  };
+  const aumentarFonte = () => setTamanhoFonte((prev) => Math.min(prev + 10, 150));
+  const diminuirFonte = () => setTamanhoFonte((prev) => Math.max(prev - 10, 80));
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setArrastando(true);
@@ -95,7 +97,7 @@ export function PainelAcessibilidade() {
     const handleMouseMove = (e: MouseEvent) => {
       const newX = e.clientX - offsetArrasto.x;
       const newY = e.clientY - offsetArrasto.y;
-      // marcar como movimento se houver deslocamento perceptível
+      
       if (!movedDuringDrag) {
         const dx = Math.abs(newX - posicao.x);
         const dy = Math.abs(newY - posicao.y);
@@ -107,6 +109,12 @@ export function PainelAcessibilidade() {
 
     const handleMouseUp = () => {
       setArrastando(false);
+      const salvo = localStorage.getItem('acessibilidade');
+      const prefsAtuais = salvo ? JSON.parse(salvo) : {};
+      localStorage.setItem('acessibilidade', JSON.stringify({
+        ...prefsAtuais,
+        posicao,
+      }));
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -135,28 +143,19 @@ export function PainelAcessibilidade() {
           --color-bg: #000;
           --color-text: #fff;
         }
-
         :root.alto-contraste body {
           background-color: #000 !important;
           color: #fff !important;
         }
-
         :root.alto-contraste * {
           border-color: #fff !important;
         }
-
         :root.reduzir-animacoes * {
           animation-duration: 0.01ms !important;
           animation-iteration-count: 1 !important;
           transition-duration: 0.01ms !important;
         }
-
-        :root.modo-dislexia {
-          font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif !important;
-          letter-spacing: 0.12em !important;
-        }
-
-        :root.modo-dislexia * {
+        :root.modo-dislexia, :root.modo-dislexia * {
           font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif !important;
           letter-spacing: 0.12em !important;
         }
@@ -206,19 +205,12 @@ export function PainelAcessibilidade() {
               <button
                 onClick={() => setAltoContraste(!altoContraste)}
                 className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
-                  altoContraste
-                    ? 'bg-indigo-600'
-                    : 'bg-zinc-200 dark:bg-zinc-700'
+                  altoContraste ? 'bg-indigo-600' : 'bg-zinc-200 dark:bg-zinc-700'
                 }`}
                 role="switch"
                 aria-checked={altoContraste}
-                aria-label="Alternar alto contraste"
               >
-                <span
-                  className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
-                    altoContraste ? 'translate-x-6' : 'translate-x-0.5'
-                  }`}
-                />
+                <span className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${altoContraste ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
 
@@ -230,19 +222,12 @@ export function PainelAcessibilidade() {
               <button
                 onClick={() => setReduzirAnimacoes(!reduzirAnimacoes)}
                 className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
-                  reduzirAnimacoes
-                    ? 'bg-indigo-600'
-                    : 'bg-zinc-200 dark:bg-zinc-700'
+                  reduzirAnimacoes ? 'bg-indigo-600' : 'bg-zinc-200 dark:bg-zinc-700'
                 }`}
                 role="switch"
                 aria-checked={reduzirAnimacoes}
-                aria-label="Alternar reduzir animações"
               >
-                <span
-                  className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
-                    reduzirAnimacoes ? 'translate-x-6' : 'translate-x-0.5'
-                  }`}
-                />
+                <span className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${reduzirAnimacoes ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
 
@@ -254,48 +239,30 @@ export function PainelAcessibilidade() {
               <button
                 onClick={() => setModoDislexia(!modoDislexia)}
                 className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
-                  modoDislexia
-                    ? 'bg-indigo-600'
-                    : 'bg-zinc-200 dark:bg-zinc-700'
+                  modoDislexia ? 'bg-indigo-600' : 'bg-zinc-200 dark:bg-zinc-700'
                 }`}
                 role="switch"
                 aria-checked={modoDislexia}
-                aria-label="Alternar fonte para dislexia"
               >
-                <span
-                  className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
-                    modoDislexia ? 'translate-x-6' : 'translate-x-0.5'
-                  }`}
-                />
+                <span className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${modoDislexia ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
 
             {/* Modo Claro/Escuro */}
             <div className="flex items-center justify-between">
               <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
-                {modoEscuro ? (
-                  <Moon className="w-3.5 h-3.5" />
-                ) : (
-                  <Sun className="w-3.5 h-3.5" />
-                )}
+                {modoEscuro ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
                 Modo Escuro
               </label>
               <button
                 onClick={() => setModoEscuro(!modoEscuro)}
                 className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
-                  modoEscuro
-                    ? 'bg-indigo-600'
-                    : 'bg-zinc-200 dark:bg-zinc-700'
+                  modoEscuro ? 'bg-indigo-600' : 'bg-zinc-200 dark:bg-zinc-700'
                 }`}
                 role="switch"
                 aria-checked={modoEscuro}
-                aria-label="Alternar modo claro/escuro"
               >
-                <span
-                  className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
-                    modoEscuro ? 'translate-x-6' : 'translate-x-0.5'
-                  }`}
-                />
+                <span className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${modoEscuro ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
 
@@ -303,7 +270,6 @@ export function PainelAcessibilidade() {
             <button
               onClick={resetarPreferencias}
               className="w-full px-3 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full transition-colors"
-              aria-label="Resetar preferências de acessibilidade"
             >
               Resetar Preferências
             </button>
@@ -314,14 +280,12 @@ export function PainelAcessibilidade() {
           onMouseDown={handleMouseDown}
           onClick={() => {
             if (movedDuringDrag) {
-              // se houve arraste, não alternar o painel
               setMovedDuringDrag(false);
               return;
             }
             setAberto(!aberto);
           }}
           className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg transition-all"
-          aria-label={aberto ? 'Fechar painel de acessibilidade' : 'Abrir painel de acessibilidade'}
           aria-expanded={aberto}
         >
           <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
