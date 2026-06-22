@@ -1,7 +1,6 @@
 'use client';
 import { Cabecalho } from '@/frontend/components/organisms/Cabecalho';
 import { ResumoTarefas } from '@/frontend/components/organisms/ResumoTarefas';
-import { QuadroTarefas } from '@/frontend/components/organisms/QuadroTarefas';
 
 export function ConteudoDashboard() {
   return (
