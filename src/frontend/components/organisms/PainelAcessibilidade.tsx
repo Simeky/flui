@@ -172,26 +172,61 @@ export function PainelAcessibilidade() {
   return (
     <>
       {vlibrasRenderizado && (
-        <div vw="true" className="enabled">
-          <div vw-access-button="true" className="active"></div>
-          <div vw-plugin-wrapper="true">
-            <div className="vw-plugin-top-wrapper"></div>
+          <div vw="true" className="enabled">
+            <div vw-access-button="true" className="active"></div>
+            <div vw-plugin-wrapper="true">
+              <div className="vw-plugin-top-wrapper"></div>
+            </div>
           </div>
-        </div>
       )}
 
       <style jsx global>{`
-        :root.alto-contraste {
-          --color-bg: #000;
-          --color-text: #fff;
+        :root.alto-contraste:not(.dark) body,
+        :root.alto-contraste:not(.dark) body * {
+          background-color: #ffffff !important;
+          color: #000000 !important;
+          border-color: #000000 !important;
         }
-        :root.alto-contraste body {
-          background-color: #000 !important;
-          color: #fff !important;
+
+        :root.alto-contraste:not(.dark) input,
+        :root.alto-contraste:not(.dark) select,
+        :root.alto-contraste:not(.dark) textarea,
+        :root.alto-contraste:not(.dark) button {
+          border: 2px solid #000000 !important;
+          background-color: #ffffff !important;
         }
-        :root.alto-contraste * {
-          border-color: #fff !important;
+
+        :root.alto-contraste:not(.dark) button[role="switch"] span {
+          background-color: #000000 !important;
         }
+
+        :root.alto-contraste:not(.dark) svg {
+          color: #000000 !important;
+        }
+
+        :root.dark.alto-contraste body,
+        :root.dark.alto-contraste body * {
+          background-color: #000000 !important;
+          color: #ffffff !important;
+          border-color: #ffffff !important;
+        }
+
+        :root.dark.alto-contraste input,
+        :root.dark.alto-contraste select,
+        :root.dark.alto-contraste textarea,
+        :root.dark.alto-contraste button {
+          border: 2px solid #ffffff !important;
+          background-color: #000000 !important;
+        }
+
+        :root.dark.alto-contraste button[role="switch"] span {
+          background-color: #ffffff !important;
+        }
+
+        :root.dark.alto-contraste svg {
+          color: #ffffff !important;
+        }
+
         :root.reduzir-animacoes * {
           animation-duration: 0.01ms !important;
           animation-iteration-count: 1 !important;
@@ -202,7 +237,6 @@ export function PainelAcessibilidade() {
           letter-spacing: 0.12em !important;
         }
         
-        /* Oculta o widget do VLibras graciosamente caso a chave seja desligada */
         :root:not(.vlibras-ativo) [vw] {
           display: none !important;
         }
