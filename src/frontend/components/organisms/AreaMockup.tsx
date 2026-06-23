@@ -51,7 +51,7 @@ export function AreaMockup() {
         </div>
 
         {/* MOLDURA DO NAVEGADOR */}
-        <div className="relative mx-auto max-w-5xl rounded-xl border border-zinc-200/80 bg-white shadow-2xl shadow-indigo-500/10 dark:border-zinc-800 dark:bg-zinc-950 overflow-hidden flex flex-col h-[650px] sm:h-[600px]">
+        <div className="relative mx-auto max-w-5xl rounded-xl border border-zinc-200/80 bg-white shadow-2xl shadow-indigo-500/10 dark:border-zinc-800 dark:bg-zinc-950 overflow-hidden flex flex-col h-162.5 sm:h-150">
           
           {/* Barra Superior do Navegador (Estilo macOS) */}
           <div className="flex shrink-0 items-center border-b border-zinc-200/80 bg-zinc-100/50 px-4 py-2.5 dark:border-zinc-800 dark:bg-zinc-900/50">
@@ -106,7 +106,7 @@ export function AreaMockup() {
                     { id: 'em_progresso', titulo: 'Fazendo' },
                     { id: 'concluida', titulo: 'Concluídas' }
                   ].map(coluna => (
-                    <div key={coluna.id} className="rounded-xl border-2 border-transparent bg-zinc-100 p-3 dark:bg-zinc-800/50 min-h-[16rem]">
+                    <div key={coluna.id} className="rounded-xl border-2 border-transparent bg-zinc-100 p-3 dark:bg-zinc-800/50 min-h-64">
                       <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-3 flex justify-between items-center px-1">
                         {coluna.titulo}
                         <span className="bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-xs py-0.5 px-2 rounded-full">
@@ -165,7 +165,7 @@ export function AreaMockup() {
                   <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm flex flex-col h-64">
                     <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">Distribuição de Status</h3>
                     <p className="text-xs text-zinc-500 mb-auto">Visão geral do progresso.</p>
-                    <div className="mx-auto w-32 h-32 rounded-full border-[16px] border-emerald-500 border-r-amber-500 border-t-blue-500 flex items-center justify-center mt-4">
+                    <div className="mx-auto w-32 h-32 rounded-full border-16 border-emerald-500 border-r-amber-500 border-t-blue-500 flex items-center justify-center mt-4">
                       <span className="text-sm font-medium text-zinc-500">Total: 3</span>
                     </div>
                   </div>
@@ -222,7 +222,7 @@ export function AreaMockup() {
         </div>
       </div>
       
-      <div className="absolute left-1/2 top-[40%] -z-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-indigo-600/15 blur-[120px] dark:bg-indigo-600/10 pointer-events-none"></div>
+      <div className="absolute left-1/2 top-[40%] z-0 h-125 w-200 -translate-x-1/2 rounded-full bg-indigo-600/15 blur-[120px] dark:bg-indigo-600/10 pointer-events-none"></div>
     </section>
   );
 }
