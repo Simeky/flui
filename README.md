@@ -102,3 +102,62 @@ npm run dev
 ```
 e acesse http://localhost:3000 no seu navegador para testar a aplicação.
 Também é possível instalar ele e adicionar ao seu celular ou desktop, ao abrir o projeto, na barra de pesquisa no canto direito terá uma opção para instalar.
+
+
+# Requisitos Funcionais
+
+- **Autenticação de Usuário:**
+  - [x] Cadastro de novos usuários com nome, e-mail e senha.
+  - [x] Envio de e-mail de verificação após o cadastro.
+  - [x] Login com e-mail e senha.
+  - [x] Login social com Google.
+  - [x] Login social com GitHub.
+  - [x] Logout (sair) do sistema.
+  - [x] Bloqueio de login se o e-mail não for verificado (para contas de e-mail/senha).
+  - [x] Exclusão de conta pelo usuário, com necessidade de reautenticação por segurança.
+
+- **Gerenciamento de Tarefas:**
+  - [x] Criação de novas tarefas com título, descrição, status, prioridade e data de vencimento.
+  - [x] Visualização de tarefas em formato de lista ou quadro.
+  - [x] Edição dos detalhes de uma tarefa existente.
+  - [x] Exclusão de uma tarefa.
+  - [x] Atribuição de status à tarefa (Pendente, Em Andamento, Concluída).
+  - [x] Definição de prioridade para a tarefa (Baixa, Média, Alta).
+  - [x] Adição de subtarefas a uma tarefa principal.
+  - [x] Adição de comentários a uma tarefa.
+
+- **Visualização e Organização:**
+  - [x] Dashboard com um resumo visual das tarefas (e.g., gráficos de status, prioridade).
+  - [x] Quadro Kanban para visualização de tarefas por status.
+  - [x] Visualização de tarefas em um calendário.
+
+# Requisitos Não Funcionais
+
+- **Usabilidade e Acessibilidade:**
+  - [x] Interface intuitiva e de fácil utilização.
+  - [x] Design responsivo, adaptável a desktops, tablets e smartphones.
+  - [x] Suporte a temas claro (light) e escuro (dark).
+  - [x] Controles de acessibilidade (e.g., aumento de fonte, contraste).
+  - [x] Notificações (toasts) para feedback de ações do usuário (sucesso, erro).
+
+- **Segurança:**
+  - [x] As senhas dos usuários devem ser armazenadas de forma segura.
+  - [x] A comunicação com o backend (Firebase) deve ser criptografada (HTTPS).
+  - [x] Validação de dados de entrada no frontend e backend para prevenir ataques (e.g., XSS).
+  - [x] Apenas usuários autenticados podem acessar e gerenciar suas próprias tarefas.
+
+- **Desempenho:**
+  - [x] Carregamento rápido da aplicação e das listas de tarefas.
+  - [x] Otimização das consultas ao banco de dados (Firestore) para evitar lentidão.
+  - [x] Utilização de PWA (Progressive Web App) para melhor performance e capacidade offline.
+
+- **Manutenibilidade e Escalabilidade:**
+  - [x] Código organizado em uma estrutura de pastas clara e consistente (frontend, backend, components, etc.).
+  - [x] Utilização de TypeScript para tipagem estática e prevenção de erros.
+  - [x] Código componentizado (React) para facilitar a reutilização e manutenção.
+  - [x] Nomes de variáveis, funções e arquivos em português para manter a consistência do projeto.
+
+- **Ambiente:**
+  - [x] Necessidade de um arquivo de configuração de ambiente (`.env.local`) para as chaves do Firebase.
+  - [x] O projeto deve ser compatível com os principais navegadores modernos (Chrome, Firefox, Safari, Edge).
+
