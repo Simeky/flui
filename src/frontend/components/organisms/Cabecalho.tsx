@@ -1,8 +1,8 @@
 'use client';
 import {
+  Calendar,
   CheckSquare,
   LayoutDashboard,
-  Calendar,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -32,9 +32,15 @@ export function Cabecalho() {
           <Link href="/calendario" className={navLinkClass('/calendario')}>
             <Calendar className="w-4 h-4"/> Calendário
           </Link>
+          
+          <Link href="/kanban" className={navLinkClass('/kanban')}>
+            <LayoutDashboard className="w-4 h-4"/> Kanban
+          </Link>
+          
           <Link href="/tarefas" className={navLinkClass('/tarefas')}>
             <CheckSquare className="w-4 h-4"/> Tarefas
           </Link>
+          
           <div className="pl-6 border-l border-zinc-200 dark:border-zinc-700 flex items-center">
             <PainelConta />
           </div>

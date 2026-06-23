@@ -24,4 +24,5 @@ export interface Tarefa {
   subtarefas: Subtarefa[];
   comentarios: Comentario[];
   criadoEm: Date;
+  ocultoNoKanban?: boolean;
 }
