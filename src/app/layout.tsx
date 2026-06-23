@@ -1,9 +1,19 @@
-import type { Metadata } from "next";
-import Script from "next/script";
-import { Geist, Geist_Mono } from "next/font/google";
-import { ProvedorAutenticacao } from "@/frontend/contexts/ContextoAutenticacao";
-import { PainelAcessibilidade } from "@/frontend/components/organisms/PainelAcessibilidade";
-import "./globals.css";
+import './globals.css';
+
+import type {
+  Metadata,
+  Viewport,
+} from 'next';
+import {
+  Geist,
+  Geist_Mono,
+} from 'next/font/google';
+import Script from 'next/script';
+
+import {
+  PainelAcessibilidade,
+} from '@/frontend/components/organisms/PainelAcessibilidade';
+import { ProvedorAutenticacao } from '@/frontend/contexts/ContextoAutenticacao';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,10 +25,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: '#4f46e5',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "Flui — Gestor de Tarefas",
   description:
     "Organize suas tarefas com simplicidade. Flui é o gestor de tarefas moderno para você.",
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Flui',
+  },
 };
 
 export default function LayoutRaiz({
