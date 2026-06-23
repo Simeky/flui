@@ -83,12 +83,14 @@ export function ResumoTarefas() {
 
       <Grid numItemsSm={1} numItemsLg={3} className="gap-6">
         <Card decoration="top" decorationColor="blue" className="dark:bg-zinc-900 dark:border-zinc-800">
-          <Flex alignItems="start">
-            <div>
+          <Flex alignItems="start" className="gap-4 flex-wrap">
+            <div className="min-w-0">
               <Text>Ativas (Pendentes/Fazendo)</Text>
               <Metric>{totalPendentes + totalEmProgresso}</Metric>
             </div>
-            <Badge size="xl" color="blue" icon={Clock} className="text-zinc-900! dark:text-white!">Em andamento</Badge>
+            <div className="shrink-0">
+              <Badge size="xl" color="blue" icon={Clock} className="whitespace-nowrap">Em andamento</Badge>
+            </div>
           </Flex>
           <Flex className="mt-4">
             <Text className="truncate text-sm">{taxaConclusao}% do total geral concluído</Text>
@@ -98,12 +100,14 @@ export function ResumoTarefas() {
         </Card>
 
         <Card decoration="top" decorationColor="emerald" className="dark:bg-zinc-900 dark:border-zinc-800">
-          <Flex alignItems="start">
-            <div>
+          <Flex alignItems="start" className="gap-4 flex-wrap">
+            <div className="min-w-0">
               <Text>Concluídas (7 dias)</Text>
               <Metric>{concluidasNaSemana}</Metric>
             </div>
-            <Badge size="xl" color="emerald" icon={CheckCircle2} className="text-zinc-900! dark:text-white!">Entregas</Badge>
+            <div className="shrink-0">
+              <Badge size="xl" color="emerald" icon={CheckCircle2} className="whitespace-nowrap">Entregas</Badge>
+            </div>
           </Flex>
           <Text className="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
             Volume de tarefas finalizadas recentemente.
@@ -111,12 +115,14 @@ export function ResumoTarefas() {
         </Card>
 
         <Card decoration="top" decorationColor="red" className="dark:bg-zinc-900 dark:border-zinc-800">
-          <Flex alignItems="start">
-            <div>
+          <Flex alignItems="start" className="gap-4 flex-wrap">
+            <div className="min-w-0">
               <Text>Tarefas Vencidas</Text>
               <Metric className="text-red-500 dark:text-red-400">{tarefasVencidas}</Metric>
             </div>
-            <Badge size="xl" color="red" icon={AlertCircle} className="text-zinc-900! dark:text-white!">Atrasos</Badge>
+            <div className="shrink-0">
+              <Badge size="xl" color="red" icon={AlertCircle} className="whitespace-nowrap">Atrasos</Badge>
+            </div>
           </Flex>
           <Text className="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
             Tarefas que já passaram do prazo de entrega.
