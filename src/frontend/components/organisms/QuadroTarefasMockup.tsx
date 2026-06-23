@@ -10,7 +10,7 @@ interface TarefaMockup {
   responsavel?: string;
 }
 
-const tarefasPorStatus = {
+const tarefasPorStatus: Record<'pendente' | 'em_progresso' | 'concluida', TarefaMockup[]> = {
   pendente: [
     {
       id: '1',
