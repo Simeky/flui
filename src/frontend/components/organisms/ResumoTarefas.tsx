@@ -85,7 +85,7 @@ export function ResumoTarefas() {
         <Card decoration="top" decorationColor="blue" className="ring-0! border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800">
           <Flex alignItems="start">
             <div>
-              <Text>Ativas (Pendentes/Fazendo)</Text>
+              <Text>Ativas (A Fazer/Fazendo)</Text>
               <Metric>{totalPendentes + totalEmProgresso}</Metric>
             </div>
             <Badge size="xl" color="blue" icon={Clock} className="ring-0! border-0! text-zinc-900! dark:text-white!">Em andamento</Badge>
