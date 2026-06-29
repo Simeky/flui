@@ -8,7 +8,6 @@ import {
   Geist,
   Geist_Mono,
 } from 'next/font/google';
-import Script from 'next/script';
 
 import {
   PainelAcessibilidade,
@@ -58,16 +57,6 @@ export default function LayoutRaiz({
         <ProvedorAutenticacao>{children}</ProvedorAutenticacao>
 
         <PainelAcessibilidade />
-
-        <div {...{ vw: '' }} className="enabled fixed bottom-4 right-4 z-50" aria-hidden="true">
-          <div {...{ 'vw-access-button': '' }} className="active" />
-          <div {...{ 'vw-plugin-wrapper': '' }} />
-        </div>
-
-        <Script
-          src="https://vlibras.gov.br/app/vlibras-plugin.js"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );
