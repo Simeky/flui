@@ -15,6 +15,7 @@ import {
   Type,
   Zap,
 } from 'lucide-react';
+import Script from 'next/script';
 
 declare module 'react' {
   interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
@@ -31,7 +32,6 @@ export function PainelAcessibilidade() {
   const [modoDislexia, setModoDislexia] = useState(false);
   const [modoEscuro, setModoEscuro] = useState(false);
   const [vlibrasAtivo, setVlibrasAtivo] = useState(false);
-  const [vlibrasRenderizado, setVlibrasRenderizado] = useState(false);
 
   const [aberto, setAberto] = useState(false);
   const [posicao, setPosicao] = useState({ x: 16, y: 80 });
@@ -52,29 +52,9 @@ export function PainelAcessibilidade() {
       
       if (prefs.vlibrasAtivo) {
         setVlibrasAtivo(true);
-        setVlibrasRenderizado(true);
       }
     }
   }, []);
-
-  useEffect(() => {
-    if (vlibrasRenderizado && !document.getElementById('vlibras-script')) {
-      const script = document.createElement('script');
-      script.id = 'vlibras-script';
-      script.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
-      script.async = true;
-      script.onload = () => {
-        // @ts-ignore
-        if (window.VLibras && !window.vlibrasInit) {
-          // @ts-ignore
-          window.vlibrasInit = true; 
-          // @ts-ignore
-          new window.VLibras.Widget('https://vlibras.gov.br/app');
-        }
-      };
-      document.body.appendChild(script);
-    }
-  }, [vlibrasRenderizado]);
 
   useEffect(() => {
     document.documentElement.style.fontSize = `${tamanhoFonte}%`;
@@ -92,7 +72,6 @@ export function PainelAcessibilidade() {
     else document.documentElement.classList.remove('dark');
 
     if (vlibrasAtivo) {
-      setVlibrasRenderizado(true); 
       document.documentElement.classList.add('vlibras-ativo');
     } else {
       document.documentElement.classList.remove('vlibras-ativo');
@@ -171,14 +150,27 @@ export function PainelAcessibilidade() {
 
   return (
     <>
-      {vlibrasRenderizado && (
-          <div vw="true" className="enabled">
-            <div vw-access-button="true" className="active"></div>
-            <div vw-plugin-wrapper="true">
-              <div className="vw-plugin-top-wrapper"></div>
-            </div>
-          </div>
-      )}
+      <div vw="true" className="enabled">
+        <div vw-access-button="true" className="active"></div>
+        <div vw-plugin-wrapper="true">
+          <div className="vw-plugin-top-wrapper"></div>
+        </div>
+      </div>
+
+      <Script
+        id="vlibras-plugin"
+        src="https://vlibras.gov.br/app/vlibras-plugin.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          // @ts-ignore
+          if (window.VLibras && !window.vlibrasInit) {
+            // @ts-ignore
+            window.vlibrasInit = true;
+            // @ts-ignore
+            new window.VLibras.Widget('https://vlibras.gov.br/app');
+          }
+        }}
+      />
 
       <style jsx global>{`
         :root.alto-contraste:not(.dark) body,
